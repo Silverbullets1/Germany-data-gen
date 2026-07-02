@@ -116,10 +116,11 @@
             font-size: 15px;
             padding: 2px 5px;
             outline: none;
-            width: 120px;
         }
-
-        select { width: 150px; cursor: pointer; }
+        
+        input[type="number"] { width: 120px; }
+        
+        select { width: 180px; cursor: pointer; }
         select option { background: var(--bg); color: var(--white); }
 
         .checkbox-label {
@@ -216,6 +217,29 @@
         
         <div class="prompt-line">
             <span class="prompt-prefix">root@silverbullet:~#</span> 
+            <span>set target_domain =</span>
+            <select id="domain-select">
+                <option value="random">ALL (Random Mix)</option>
+                <option value="gmail.com">gmail.com</option>
+                <option value="web.de">web.de</option>
+                <option value="gmx.de">gmx.de</option>
+                <option value="t-online.de">t-online.de</option>
+                <option value="outlook.com">outlook.com</option>
+                <option value="hotmail.de">hotmail.de</option>
+                <option value="icloud.com">icloud.com</option>
+                <option value="mail.de">mail.de</option>
+                <option value="freenet.de">freenet.de</option>
+                <option value="online.de">online.de</option>
+                <option value="posteo.de">posteo.de</option>
+                <option value="mailbox.org">mailbox.org</option>
+                <option value="yahoo.de">yahoo.de</option>
+                <option value="live.de">live.de</option>
+                <option value="aol.de">aol.de</option>
+            </select>
+        </div>
+        
+        <div class="prompt-line">
+            <span class="prompt-prefix">root@silverbullet:~#</span> 
             <span>set data_format =</span>
             <select id="format">
                 <option value="email:pass">email:pass</option>
@@ -256,12 +280,20 @@
         // German Datasets
         const first = ["lukas", "leon", "finn", "paul", "jonas", "ben", "maximilian", "anna", "mia", "emma", "hannah", "sophia", "lena", "lea", "felix", "tim"];
         const last = ["muller", "schmidt", "schneider", "fischer", "weber", "meyer", "wagner", "becker", "schulz", "hoffmann", "koch", "bauer", "richter", "klein", "wolf"];
-        const domains = ["gmail.com", "web.de", "gmx.de", "t-online.de", "outlook.com", "hotmail.de", "icloud.com", "mail.de", "freenet.de", "online.de", "posteo.de", "mailbox.org", "yahoo.de", "live.de", "aol.de"];
-        const symbols = ['!', '@', '#', '$', '123', '2023', '2024', '1234', '12345'];
+        
+        const domains = [
+            "gmail.com", "web.de", "gmx.de", "t-online.de", "outlook.com", 
+            "hotmail.de", "icloud.com", "mail.de", "freenet.de", "online.de", 
+            "posteo.de", "mailbox.org", "yahoo.de", "live.de", "aol.de"
+        ];
+        
+        // Symbols for dynamic injection
+        const specialChars = ['!', '@', '#', '$', '?', '*'];
 
         // DOM Elements
         const DOM = {
             amount: document.getElementById('amount'),
+            domainSelect: document.getElementById('domain-select'),
             format: document.getElementById('format'),
             optNum: document.getElementById('opt-numbers'),
             optCaps: document.getElementById('opt-caps'),
@@ -277,31 +309,39 @@
 
         // Data Generation Functions
         function getUser(f, l) {
-            const patterns = [`${f}.${l}`, `${f}${l}`, `${f}_${l}`, `${f}${Math.floor(Math.random()*999)}`, `${l}.${f}`, `${f.charAt(0)}${l}`];
+            const patterns = [`${f}.${l}`, `${f}${l}`, `${f}_${l}`, `${f}${Math.floor(Math.random()*9999)}`, `${l}.${f}`, `${f.charAt(0)}${l}`];
             return getRandom(patterns);
+        }
+
+        function getDynamicSuffix() {
+            // Generates highly randomized suffixes for passwords
+            const types = [
+                Math.floor(Math.random() * 9999), // Random 0-9999
+                Math.floor(Math.random() * 99),   // Random 0-99
+                (1980 + Math.floor(Math.random() * 45)), // Random year 1980-2025
+                ['123', '1234', '12345', '123456'][Math.floor(Math.random() * 4)], // Common sequences
+                getRandom(specialChars) + Math.floor(Math.random() * 999), // Symbol + numbers
+                getRandom(specialChars) + (1980 + Math.floor(Math.random() * 45)) // Symbol + year
+            ];
+            return getRandom(types);
         }
 
         function getPass(l, useNum, useCaps) {
             let base = l;
             if (useCaps) base = base.charAt(0).toUpperCase() + base.slice(1);
-            let ending = useNum ? getRandom(symbols) : '';
-            return `${base}${ending}`;
+            if (useNum) base += getDynamicSuffix();
+            return base;
         }
 
-        // Safe Print Function (Ignores sandbox scrolling errors)
+        // Safe Print Function
         async function printLine(html, delay = 100) {
             DOM.console.innerHTML += html + "<br>";
-            try {
-                // Sandbox-safe scrolling
-                DOM.console.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            } catch (e) {
-                // Ignore scrolling errors if sandbox blocks it
-            }
+            try { DOM.console.scrollIntoView({ behavior: 'smooth', block: 'end' }); } catch (e) {}
             await sleep(delay);
         }
 
         // Terminal Boot Animation Logic
-        async function runBootSequence(amount) {
+        async function runBootSequence(amount, targetDomain) {
             DOM.console.style.display = "block";
             DOM.dataDump.style.display = "none";
             DOM.console.innerHTML = "";
@@ -313,9 +353,9 @@
             const checks = [
                 "Checking system entropy...",
                 "Validating worker threads...",
-                "Loading crypto modules...",
+                "Configuring dynamic injection logic...",
                 "Allocating memory buffers...",
-                "Initializing schedulers...",
+                `Binding to target routing: ${targetDomain.toUpperCase()}`,
                 "Verifying network stack..."
             ];
 
@@ -352,7 +392,8 @@
 
             try {
                 // 1. Run Terminal Animation
-                await runBootSequence(amount);
+                const selectedDomain = DOM.domainSelect.value;
+                await runBootSequence(amount, selectedDomain);
 
                 // 2. Generate Data
                 const format = DOM.format.value;
@@ -369,7 +410,9 @@
                     if (format === 'user:pass') {
                         results[i] = `${user}:${pass}`;
                     } else {
-                        results[i] = `${user}@${getRandom(domains)}:${pass}`;
+                        // Determine domain
+                        let d = (selectedDomain === 'random') ? getRandom(domains) : selectedDomain;
+                        results[i] = `${user}@${d}:${pass}`;
                     }
                 }
 
@@ -381,12 +424,9 @@
                 DOM.btnCopy.classList.remove("hidden");
                 DOM.btnExport.classList.remove("hidden");
                 
-                try {
-                    DOM.dataDump.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                } catch(e) {}
+                try { DOM.dataDump.scrollIntoView({ behavior: 'smooth', block: 'end' }); } catch(e) {}
 
             } catch (err) {
-                // Failsafe: If animation crashes entirely, still give the data
                 console.error("Animation Error:", err);
                 DOM.dataDump.value = "An error occurred during animation, but generator is active.\nPlease try exporting again.";
                 DOM.dataDump.style.display = "block";
