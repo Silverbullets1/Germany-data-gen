@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SILVERBULLET | Germany Combo Engine</title>
+    <title>SILVERBULLET | Germany Combo Engine Pro</title>
     <style>
         :root {
             --bg: #0c0c0c;
@@ -107,6 +107,19 @@
 
         .prompt-prefix { color: var(--cyan); }
         
+        /* Blinking Terminal Cursor */
+        .cursor::after {
+            content: '█';
+            color: var(--magenta);
+            animation: blink 1s step-end infinite;
+            margin-left: 5px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
         input[type="number"], select {
             background: transparent;
             border: none;
@@ -203,7 +216,7 @@
 
     <div class="header-container">
         <div class="logo">SILVERBULLET</div>
-        <div class="subtitle">Germany Combo Engine = v1.0</div>
+        <div class="subtitle">Germany Combo Engine = v2.0 Pro</div>
         <div class="dev-credit">developed by: <a href="https://t.me/Silverbullets_bot" target="_blank">@Silverbullets_bot</a></div>
     </div>
 
@@ -264,7 +277,9 @@
         </div>
 
         <div class="action-buttons">
-            <button id="generate-btn" class="btn-magenta">./execute_engine.sh</button>
+            <span class="cursor" id="exec-cursor">
+                <button id="generate-btn" class="btn-magenta">./execute_engine.sh</button>
+            </span>
             <button id="copy-btn" class="hidden">Copy Payload</button>
             <button id="download-btn" class="hidden">Export .TXT</button>
         </div>
@@ -277,9 +292,23 @@
     <textarea id="data-dump" readonly spellcheck="false"></textarea>
 
     <script>
-        // German Datasets
-        const first = ["lukas", "leon", "finn", "paul", "jonas", "ben", "maximilian", "anna", "mia", "emma", "hannah", "sophia", "lena", "lea", "felix", "tim"];
-        const last = ["muller", "schmidt", "schneider", "fischer", "weber", "meyer", "wagner", "becker", "schulz", "hoffmann", "koch", "bauer", "richter", "klein", "wolf"];
+        // Expanded Pro Datasets (Top German Names - Normalized)
+        const first = [
+            "lukas", "leon", "finn", "paul", "jonas", "ben", "maximilian", "anna", "mia", "emma", "hannah", "sophia", "lena", "lea", "felix", "tim", 
+            "julian", "niklas", "max", "moritz", "david", "elias", "louis", "marie", "laura", "sarah", "lara", "neele", "lisa", "charlotte", "clara", 
+            "johanna", "alexander", "michael", "daniel", "christian", "stefan", "thomas", "jan", "kevin", "dennis", "patrick", "martin", "andreas", 
+            "peter", "frank", "jens", "dirk", "uwe", "dieter", "werner", "klaus", "gunter", "heinz", "manfred", "helmut", "wolfgang", "ursula", 
+            "karin", "sabine", "monika", "petra", "renate", "susanne", "gisela", "ingrid", "christa", "tobias", "matthias", "sebastian", "philipp", 
+            "simon", "florian", "dominik", "marcel", "sascha", "rene", "julia", "stephanie", "melanie", "nadine", "katharina"
+        ];
+        
+        const last = [
+            "muller", "schmidt", "schneider", "fischer", "weber", "meyer", "wagner", "becker", "schulz", "hoffmann", "koch", "bauer", "richter", 
+            "klein", "wolf", "schroder", "neumann", "schwarz", "zimmermann", "braun", "kruger", "hofmann", "hartmann", "lange", "schmitt", "werner", 
+            "krause", "meier", "sommer", "fuchs", "keller", "schubert", "roth", "walter", "kramer", "huber", "peters", "lang", "scholz", "moller", 
+            "weiss", "jung", "haas", "heinrich", "kaiser", "frank", "friedrich", "gunther", "hermann", "vogt", "winkler", "dietz", "lorenz", 
+            "ludwig", "baumann", "simon", "bohm", "horn", "thomas", "kuhn", "kramer", "seidel", "arnold", "busch", "beyer", "barth", "herrmann"
+        ];
         
         const domains = [
             "gmail.com", "web.de", "gmx.de", "t-online.de", "outlook.com", 
@@ -301,7 +330,8 @@
             btnCopy: document.getElementById('copy-btn'),
             btnExport: document.getElementById('download-btn'),
             console: document.getElementById('console-output'),
-            dataDump: document.getElementById('data-dump')
+            dataDump: document.getElementById('data-dump'),
+            execCursor: document.getElementById('exec-cursor')
         };
 
         const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -314,7 +344,6 @@
         }
 
         function getDynamicSuffix() {
-            // Generates highly randomized suffixes for passwords
             const types = [
                 Math.floor(Math.random() * 9999), // Random 0-9999
                 Math.floor(Math.random() * 99),   // Random 0-99
@@ -340,46 +369,6 @@
             await sleep(delay);
         }
 
-        // Terminal Boot Animation Logic
-        async function runBootSequence(amount, targetDomain) {
-            DOM.console.style.display = "block";
-            DOM.dataDump.style.display = "none";
-            DOM.console.innerHTML = "";
-            DOM.btnCopy.classList.add("hidden");
-            DOM.btnExport.classList.add("hidden");
-
-            await printLine(`<span class="cyan">Initializing Engine Subsystems</span><br>`, 200);
-            
-            const checks = [
-                "Checking system entropy...",
-                "Validating worker threads...",
-                "Configuring dynamic injection logic...",
-                "Allocating memory buffers...",
-                `Binding to target routing: ${targetDomain.toUpperCase()}`,
-                "Verifying network stack..."
-            ];
-
-            for (let check of checks) {
-                await printLine(`<span class="yellow">[ CHECK ]</span> ${check} <span class="green">OK</span>`, 100);
-            }
-
-            await printLine("", 150);
-
-            for (let i = 3; i > 0; i--) {
-                await printLine(`<span class="magenta">Starting in ${i}...</span>`, 500);
-            }
-
-            await printLine(`<br><span class="cyan">[ LOAD ]</span> Accounts loaded : <span class="cyan">${amount}</span><br>`, 300);
-            await printLine(`<span class="cyan">[ LINK ]</span> Establishing account tunnels...<br>`, 300);
-
-            for (let i = 0; i < 8; i++) {
-                await printLine(`<span class="yellow">[ CONNECT ]</span> Synchronizing account shards...`, 40);
-            }
-            
-            await sleep(300);
-            await printLine(`<br><span class="green">[ SUCCESS ] Payload Generated. Dumping to interface...</span><br>`, 200);
-        }
-
         // Main Execution
         DOM.btnGen.addEventListener('click', async () => {
             let amount = parseInt(DOM.amount.value);
@@ -389,35 +378,79 @@
 
             DOM.btnGen.disabled = true;
             DOM.btnGen.innerText = "PROCESSING...";
+            DOM.execCursor.style.animation = "none"; // Stop blink while processing
 
             try {
-                // 1. Run Terminal Animation
+                // 1. Terminal Animation Configuration
                 const selectedDomain = DOM.domainSelect.value;
-                await runBootSequence(amount, selectedDomain);
+                DOM.console.style.display = "block";
+                DOM.dataDump.style.display = "none";
+                DOM.console.innerHTML = "";
+                DOM.btnCopy.classList.add("hidden");
+                DOM.btnExport.classList.add("hidden");
 
-                // 2. Generate Data
+                await printLine(`<span class="cyan">Initializing Engine Subsystems</span><br>`, 200);
+                
+                const checks = [
+                    "Checking system entropy...",
+                    "Validating worker threads...",
+                    "Loading expanded dictionary modules...",
+                    `Binding to target routing: ${selectedDomain.toUpperCase()}`,
+                    "Verifying network stack..."
+                ];
+
+                for (let check of checks) {
+                    await printLine(`<span class="yellow">[ CHECK ]</span> ${check} <span class="green">OK</span>`, 100);
+                }
+
+                await printLine("", 150);
+
+                for (let i = 3; i > 0; i--) {
+                    await printLine(`<span class="magenta">Starting in ${i}...</span>`, 500);
+                }
+
+                await printLine(`<br><span class="cyan">[ LOAD ]</span> Accounts requested : <span class="cyan">${amount}</span><br>`, 300);
+                
+                for (let i = 0; i < 4; i++) {
+                    await printLine(`<span class="yellow">[ GENERATE ]</span> Injecting suffixes and combining matrices...`, 40);
+                }
+
+                // 2. Generate Data with Auto-Deduplication Engine
                 const format = DOM.format.value;
                 const useNum = DOM.optNum.checked;
                 const useCaps = DOM.optCaps.checked;
-                let results = new Array(amount);
+                
+                let resultsSet = new Set();
+                let loopLimit = amount * 1.5; // Prevent infinite loop lockup
+                let attempts = 0;
 
-                for (let i = 0; i < amount; i++) {
+                while (resultsSet.size < amount && attempts < loopLimit) {
                     const f = getRandom(first);
                     const l = getRandom(last);
                     const user = getUser(f, l);
                     const pass = getPass(l, useNum, useCaps);
                     
+                    let finalString = "";
                     if (format === 'user:pass') {
-                        results[i] = `${user}:${pass}`;
+                        finalString = `${user}:${pass}`;
                     } else {
-                        // Determine domain
                         let d = (selectedDomain === 'random') ? getRandom(domains) : selectedDomain;
-                        results[i] = `${user}@${d}:${pass}`;
+                        finalString = `${user}@${d}:${pass}`;
                     }
+                    
+                    resultsSet.add(finalString);
+                    attempts++;
                 }
 
-                // 3. Output Data
-                DOM.dataDump.value = results.join('\n');
+                let finalArray = Array.from(resultsSet);
+                let duplicatesRemoved = attempts - finalArray.length;
+
+                // 3. Output Data & Post-Gen Logging
+                await sleep(400);
+                await printLine(`<span class="magenta">[ OPTIMIZE ]</span> Deduplication engine scrubbed <span class="white">${duplicatesRemoved}</span> exact duplicates.`, 300);
+                await printLine(`<br><span class="green">[ SUCCESS ] ${finalArray.length} Unique Payloads Generated. Dumping to interface...</span><br>`, 200);
+
+                DOM.dataDump.value = finalArray.join('\n');
                 DOM.dataDump.style.display = "block";
                 
                 // 4. Reveal Action Buttons & Reset
@@ -433,6 +466,7 @@
             } finally {
                 DOM.btnGen.disabled = false;
                 DOM.btnGen.innerText = "./execute_engine.sh";
+                DOM.execCursor.style.animation = ""; // Restore blink
             }
         });
 
@@ -457,7 +491,7 @@
             if (!DOM.dataDump.value) return;
             const a = document.createElement('a');
             a.href = URL.createObjectURL(new Blob([DOM.dataDump.value], {type: 'text/plain'}));
-            a.download = `Germany_Combos_${DOM.amount.value}.txt`;
+            a.download = `SVB_Germany_Combos_${DOM.amount.value}.txt`;
             a.click();
             URL.revokeObjectURL(a.href);
         };
