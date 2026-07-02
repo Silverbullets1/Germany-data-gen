@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SILVERBULLET | Germany Combo Engine</title>
+    <style>
+        :root {
+            --bg: #0c0c0c;
+            --magenta: #d94fd9;
+            --cyan: #36b3d4;
+            --yellow: #d6d63c;
+            --green: #42d142;
+            --white: #e0e0e0;
+            --font-mono: Consolas, "Courier New", Courier, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--white);
+            font-family: var(--font-mono);
+            min-height: 100vh;
+            padding: 30px;
+            font-size: 15px;
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+
+        /* Scanline Overlay */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* Typography Colors */
+        .magenta { color: var(--magenta); }
+        .cyan { color: var(--cyan); }
+        .yellow { color: var(--yellow); }
+        .green { color: var(--green); }
+        .white { color: var(--white); }
+
+        /* Logo Area */
+        .header-container {
+            margin-bottom: 30px;
+            max-width: 800px;
+        }
+
+        .logo {
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            color: transparent;
+            -webkit-text-stroke: 2px var(--magenta);
+            letter-spacing: 4px;
+            text-shadow: 4px 4px 0px rgba(217, 79, 217, 0.2);
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .subtitle {
+            text-align: right;
+            color: var(--magenta);
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .dev-credit {
+            text-align: right;
+            margin-top: 5px;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .dev-credit a {
+            color: var(--cyan);
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .dev-credit a:hover {
+            color: var(--magenta);
+            text-shadow: 0 0 8px rgba(217, 79, 217, 0.5);
+        }
+
+        /* Interactive Terminal Form */
+        #ui-layer {
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+
+        .prompt-line {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .prompt-prefix { color: var(--cyan); }
+        
+        input[type="number"], select {
+            background: transparent;
+            border: none;
+            border-bottom: 1px dashed var(--magenta);
+            color: var(--yellow);
+            font-family: var(--font-mono);
+            font-size: 15px;
+            padding: 2px 5px;
+            outline: none;
+            width: 120px;
+        }
+
+        select { width: 150px; cursor: pointer; }
+        select option { background: var(--bg); color: var(--white); }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: var(--white);
+        }
+
+        input[type="checkbox"] {
+            accent-color: var(--magenta);
+            cursor: pointer;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            font-family: var(--font-mono);
+            font-size: 15px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--cyan);
+            color: var(--bg);
+        }
+        
+        button:disabled {
+            border-color: #333;
+            color: #555;
+            cursor: not-allowed;
+        }
+
+        .btn-magenta { border-color: var(--magenta); color: var(--magenta); }
+        .btn-magenta:hover:not(:disabled) { background: var(--magenta); color: var(--bg); }
+
+        /* Console Output Area */
+        #console-output {
+            max-width: 900px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            display: none; 
+            padding-bottom: 20px;
+        }
+
+        #data-dump {
+            width: 100%;
+            max-width: 900px;
+            height: 400px;
+            background: transparent;
+            border: 1px solid #333;
+            color: var(--white);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            padding: 15px;
+            margin-top: 15px;
+            resize: vertical;
+            outline: none;
+            display: none;
+        }
+
+        #data-dump:focus { border-color: var(--magenta); }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="logo">SILVERBULLET</div>
+        <div class="subtitle">Germany Combo Engine = v1.0</div>
+        <div class="dev-credit">developed by: <a href="https://t.me/Silverbullets_bot" target="_blank">@Silverbullets_bot</a></div>
+    </div>
+
+    <!-- User Input UI -->
+    <div id="ui-layer">
+        <div class="prompt-line">
+            <span class="prompt-prefix">root@silverbullet:~#</span> 
+            <span>set target_volume =</span>
+            <input type="number" id="amount" value="5000" min="1" max="500000">
+        </div>
+        
+        <div class="prompt-line">
+            <span class="prompt-prefix">root@silverbullet:~#</span> 
+            <span>set data_format =</span>
+            <select id="format">
+                <option value="email:pass">email:pass</option>
+                <option value="user:pass">user:pass</option>
+            </select>
+        </div>
+
+        <div class="prompt-line">
+            <span class="prompt-prefix">root@silverbullet:~#</span> 
+            <label class="checkbox-label">
+                <input type="checkbox" id="opt-numbers" checked>
+                [ ENABLE ] numeric_suffix_injection
+            </label>
+        </div>
+
+        <div class="prompt-line">
+            <span class="prompt-prefix">root@silverbullet:~#</span> 
+            <label class="checkbox-label">
+                <input type="checkbox" id="opt-caps" checked>
+                [ ENABLE ] capitalize_passwords
+            </label>
+        </div>
+
+        <div class="action-buttons">
+            <button id="generate-btn" class="btn-magenta">./execute_engine.sh</button>
+            <button id="copy-btn" class="hidden">Copy Payload</button>
+            <button id="download-btn" class="hidden">Export .TXT</button>
+        </div>
+    </div>
+
+    <!-- Live Terminal Boot Sequence -->
+    <div id="console-output"></div>
+
+    <!-- Final Data Output -->
+    <textarea id="data-dump" readonly spellcheck="false"></textarea>
+
+    <script>
+        // German Datasets
+        const first = ["lukas", "leon", "finn", "paul", "jonas", "ben", "maximilian", "anna", "mia", "emma", "hannah", "sophia", "lena", "lea", "felix", "tim"];
+        const last = ["muller", "schmidt", "schneider", "fischer", "weber", "meyer", "wagner", "becker", "schulz", "hoffmann", "koch", "bauer", "richter", "klein", "wolf"];
+        const domains = ["gmail.com", "web.de", "gmx.de", "t-online.de", "outlook.com", "hotmail.de", "icloud.com", "mail.de", "freenet.de", "online.de", "posteo.de", "mailbox.org", "yahoo.de", "live.de", "aol.de"];
+        const symbols = ['!', '@', '#', '$', '123', '2023', '2024', '1234', '12345'];
+
+        // DOM Elements
+        const DOM = {
+            amount: document.getElementById('amount'),
+            format: document.getElementById('format'),
+            optNum: document.getElementById('opt-numbers'),
+            optCaps: document.getElementById('opt-caps'),
+            btnGen: document.getElementById('generate-btn'),
+            btnCopy: document.getElementById('copy-btn'),
+            btnExport: document.getElementById('download-btn'),
+            console: document.getElementById('console-output'),
+            dataDump: document.getElementById('data-dump')
+        };
+
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+        const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+        // Data Generation Functions
+        function getUser(f, l) {
+            const patterns = [`${f}.${l}`, `${f}${l}`, `${f}_${l}`, `${f}${Math.floor(Math.random()*999)}`, `${l}.${f}`, `${f.charAt(0)}${l}`];
+            return getRandom(patterns);
+        }
+
+        function getPass(l, useNum, useCaps) {
+            let base = l;
+            if (useCaps) base = base.charAt(0).toUpperCase() + base.slice(1);
+            let ending = useNum ? getRandom(symbols) : '';
+            return `${base}${ending}`;
+        }
+
+        // Safe Print Function (Ignores sandbox scrolling errors)
+        async function printLine(html, delay = 100) {
+            DOM.console.innerHTML += html + "<br>";
+            try {
+                // Sandbox-safe scrolling
+                DOM.console.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            } catch (e) {
+                // Ignore scrolling errors if sandbox blocks it
+            }
+            await sleep(delay);
+        }
+
+        // Terminal Boot Animation Logic
+        async function runBootSequence(amount) {
+            DOM.console.style.display = "block";
+            DOM.dataDump.style.display = "none";
+            DOM.console.innerHTML = "";
+            DOM.btnCopy.classList.add("hidden");
+            DOM.btnExport.classList.add("hidden");
+
+            await printLine(`<span class="cyan">Initializing Engine Subsystems</span><br>`, 200);
+            
+            const checks = [
+                "Checking system entropy...",
+                "Validating worker threads...",
+                "Loading crypto modules...",
+                "Allocating memory buffers...",
+                "Initializing schedulers...",
+                "Verifying network stack..."
+            ];
+
+            for (let check of checks) {
+                await printLine(`<span class="yellow">[ CHECK ]</span> ${check} <span class="green">OK</span>`, 100);
+            }
+
+            await printLine("", 150);
+
+            for (let i = 3; i > 0; i--) {
+                await printLine(`<span class="magenta">Starting in ${i}...</span>`, 500);
+            }
+
+            await printLine(`<br><span class="cyan">[ LOAD ]</span> Accounts loaded : <span class="cyan">${amount}</span><br>`, 300);
+            await printLine(`<span class="cyan">[ LINK ]</span> Establishing account tunnels...<br>`, 300);
+
+            for (let i = 0; i < 8; i++) {
+                await printLine(`<span class="yellow">[ CONNECT ]</span> Synchronizing account shards...`, 40);
+            }
+            
+            await sleep(300);
+            await printLine(`<br><span class="green">[ SUCCESS ] Payload Generated. Dumping to interface...</span><br>`, 200);
+        }
+
+        // Main Execution
+        DOM.btnGen.addEventListener('click', async () => {
+            let amount = parseInt(DOM.amount.value);
+            if (isNaN(amount) || amount < 1) amount = 1;
+            if (amount > 500000) amount = 500000;
+            DOM.amount.value = amount;
+
+            DOM.btnGen.disabled = true;
+            DOM.btnGen.innerText = "PROCESSING...";
+
+            try {
+                // 1. Run Terminal Animation
+                await runBootSequence(amount);
+
+                // 2. Generate Data
+                const format = DOM.format.value;
+                const useNum = DOM.optNum.checked;
+                const useCaps = DOM.optCaps.checked;
+                let results = new Array(amount);
+
+                for (let i = 0; i < amount; i++) {
+                    const f = getRandom(first);
+                    const l = getRandom(last);
+                    const user = getUser(f, l);
+                    const pass = getPass(l, useNum, useCaps);
+                    
+                    if (format === 'user:pass') {
+                        results[i] = `${user}:${pass}`;
+                    } else {
+                        results[i] = `${user}@${getRandom(domains)}:${pass}`;
+                    }
+                }
+
+                // 3. Output Data
+                DOM.dataDump.value = results.join('\n');
+                DOM.dataDump.style.display = "block";
+                
+                // 4. Reveal Action Buttons & Reset
+                DOM.btnCopy.classList.remove("hidden");
+                DOM.btnExport.classList.remove("hidden");
+                
+                try {
+                    DOM.dataDump.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                } catch(e) {}
+
+            } catch (err) {
+                // Failsafe: If animation crashes entirely, still give the data
+                console.error("Animation Error:", err);
+                DOM.dataDump.value = "An error occurred during animation, but generator is active.\nPlease try exporting again.";
+                DOM.dataDump.style.display = "block";
+            } finally {
+                DOM.btnGen.disabled = false;
+                DOM.btnGen.innerText = "./execute_engine.sh";
+            }
+        });
+
+        // Utilities
+        DOM.btnCopy.addEventListener('click', async () => {
+            if (!DOM.dataDump.value) return;
+            try {
+                await navigator.clipboard.writeText(DOM.dataDump.value);
+                const originalText = DOM.btnCopy.innerText;
+                DOM.btnCopy.innerText = "[ COPIED ]";
+                DOM.btnCopy.style.color = "var(--green)";
+                DOM.btnCopy.style.borderColor = "var(--green)";
+                setTimeout(() => {
+                    DOM.btnCopy.innerText = originalText;
+                    DOM.btnCopy.style.color = "";
+                    DOM.btnCopy.style.borderColor = "";
+                }, 2000);
+            } catch (err) { alert('Copy failed.'); }
+        });
+
+        DOM.btnExport.onclick = () => {
+            if (!DOM.dataDump.value) return;
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([DOM.dataDump.value], {type: 'text/plain'}));
+            a.download = `Germany_Combos_${DOM.amount.value}.txt`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        };
+    </script>
+</body>
+</html>
