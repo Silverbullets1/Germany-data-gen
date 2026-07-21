@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SILVERBULLET | Germany Combo Engine Pro v3</title>
     <style>
-        /* ... keep the exact same CSS as before ... */
         :root {
             --bg: #0c0c0c;
             --magenta: #d94fd9;
@@ -16,44 +15,193 @@
             --white: #e0e0e0;
             --font-mono: Consolas, "Courier New", Courier, monospace;
         }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: var(--bg); color: var(--white); font-family: var(--font-mono); min-height: 100vh; padding: 30px; font-size: 15px; line-height: 1.4; overflow-x: hidden; }
-        body::after { content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 999; }
-        .magenta { color: var(--magenta); } .cyan { color: var(--cyan); } .yellow { color: var(--yellow); } .green { color: var(--green); } .red { color: var(--red); } .white { color: var(--white); }
-        .header-container { margin-bottom: 20px; max-width: 900px; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #333; padding-bottom: 15px; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--white);
+            font-family: var(--font-mono);
+            min-height: 100vh;
+            padding: 30px;
+            font-size: 15px;
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .magenta { color: var(--magenta); }
+        .cyan { color: var(--cyan); }
+        .yellow { color: var(--yellow); }
+        .green { color: var(--green); }
+        .red { color: var(--red); }
+        .white { color: var(--white); }
+
+        .header-container {
+            margin-bottom: 20px;
+            max-width: 900px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid #333;
+            padding-bottom: 15px;
+        }
+
         .logo-block { display: flex; flex-direction: column; }
-        .logo { font-family: 'Impact', 'Arial Black', sans-serif; font-size: clamp(2.5rem, 6vw, 5rem); color: transparent; -webkit-text-stroke: 2px var(--magenta); letter-spacing: 4px; text-shadow: 4px 4px 0px rgba(217, 79, 217, 0.2); text-transform: uppercase; line-height: 1; }
-        .subtitle { color: var(--magenta); margin-top: 5px; font-weight: bold; font-size: 20px; letter-spacing: 1px; }
+
+        .logo {
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            color: transparent;
+            -webkit-text-stroke: 2px var(--magenta);
+            letter-spacing: 4px;
+            text-shadow: 4px 4px 0px rgba(217, 79, 217, 0.2);
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .subtitle {
+            color: var(--magenta);
+            margin-top: 5px;
+            font-weight: bold;
+            font-size: 20px;
+            letter-spacing: 1px;
+        }
+
         .dev-credit { margin-top: 5px; font-size: 14px; color: #888; }
         .dev-credit a { color: var(--cyan); text-decoration: none; transition: 0.2s; }
         .dev-credit a:hover { color: var(--magenta); text-shadow: 0 0 8px rgba(217, 79, 217, 0.5); }
+
         .server-hud { text-align: right; font-size: 13px; color: #777; }
-        .hud-line { margin-bottom: 4px; } .hud-label { color: #555; }
-        .pulse-green { animation: pulse-g 1.5s infinite; color: var(--green); }
-        @keyframes pulse-g { 0% { opacity: 0.5; text-shadow: none; } 50% { opacity: 1; text-shadow: 0 0 8px var(--green); } 100% { opacity: 0.5; text-shadow: none; } }
-        #ui-layer { max-width: 900px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.02); border: 1px solid #222; padding: 20px; }
-        .prompt-line { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+        .hud-line { margin-bottom: 4px; }
+        .hud-label { color: #555; }
+
+        .pulse-green {
+            animation: pulse-g 1.5s infinite;
+            color: var(--green);
+        }
+
+        @keyframes pulse-g {
+            0% { opacity: 0.5; text-shadow: none; }
+            50% { opacity: 1; text-shadow: 0 0 8px var(--green); }
+            100% { opacity: 0.5; text-shadow: none; }
+        }
+
+        #ui-layer {
+            max-width: 900px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid #222;
+            padding: 20px;
+        }
+
+        .prompt-line {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
         .prompt-prefix { color: var(--cyan); }
-        .cursor::after { content: '█'; color: var(--magenta); animation: blink 1s step-end infinite; margin-left: 5px; }
+
+        .cursor::after {
+            content: '█';
+            color: var(--magenta);
+            animation: blink 1s step-end infinite;
+            margin-left: 5px;
+        }
+
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-        input[type="number"], select { background: rgba(0,0,0,0.5); border: 1px solid #444; color: var(--yellow); font-family: var(--font-mono); font-size: 15px; padding: 4px 8px; outline: none; }
+
+        input[type="number"], select {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #444;
+            color: var(--yellow);
+            font-family: var(--font-mono);
+            font-size: 15px;
+            padding: 4px 8px;
+            outline: none;
+        }
+
         input[type="number"]:focus, select:focus { border-color: var(--magenta); }
-        input[type="number"] { width: 120px; } select { width: 180px; cursor: pointer; } select option { background: var(--bg); color: var(--white); }
-        .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--white); }
+        input[type="number"] { width: 120px; }
+        select { width: 180px; cursor: pointer; }
+        select option { background: var(--bg); color: var(--white); }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: var(--white);
+        }
+
         input[type="checkbox"] { accent-color: var(--magenta); cursor: pointer; }
-        .action-buttons { display: flex; gap: 15px; margin-top: 25px; flex-wrap: wrap; }
-        button { background: transparent; border: 1px solid var(--cyan); color: var(--cyan); font-family: var(--font-mono); font-size: 15px; padding: 8px 16px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            font-family: var(--font-mono);
+            font-size: 15px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+
         button:hover:not(:disabled) { background: var(--cyan); color: var(--bg); }
         button:disabled { border-color: #333; color: #555; cursor: not-allowed; }
+
         .btn-magenta { border-color: var(--magenta); color: var(--magenta); }
         .btn-magenta:hover:not(:disabled) { background: var(--magenta); color: var(--bg); }
-        #console-output { max-width: 900px; margin-top: 20px; white-space: pre-wrap; display: none; padding: 15px; background: #050505; border: 1px solid #222; height: 300px; overflow-y: hidden; }
-        #data-dump { width: 100%; max-width: 900px; height: 400px; background: #050505; border: 1px solid #333; color: var(--green); font-family: var(--font-mono); font-size: 13px; padding: 15px; margin-top: 15px; resize: vertical; outline: none; display: none; }
+
+        #console-output {
+            max-width: 900px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            display: none;
+            padding: 15px;
+            background: #050505;
+            border: 1px solid #222;
+            height: 300px;
+            overflow-y: hidden;
+        }
+
+        #data-dump {
+            width: 100%;
+            max-width: 900px;
+            height: 400px;
+            background: #050505;
+            border: 1px solid #333;
+            color: var(--green);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            padding: 15px;
+            margin-top: 15px;
+            resize: vertical;
+            outline: none;
+            display: none;
+        }
+
         #data-dump:focus { border-color: var(--magenta); box-shadow: 0 0 10px rgba(217, 79, 217, 0.2); }
         .hidden { display: none !important; }
-        /* Live mode toggle style */
-        #live-mode-label { color: var(--yellow); margin-left: 10px; }
-        #live-mode-label input { margin-right: 5px; }
     </style>
 </head>
 <body>
@@ -75,12 +223,12 @@
     <!-- User Input UI -->
     <div id="ui-layer">
         <div class="prompt-line">
-            <span class="prompt-prefix">root@silverbullet:~#</span> 
+            <span class="prompt-prefix">root@silverbullet:~#</span>
             <span>set target_volume =</span>
             <input type="number" id="amount" value="100" min="1" max="500000">
         </div>
         <div class="prompt-line">
-            <span class="prompt-prefix">root@silverbullet:~#</span> 
+            <span class="prompt-prefix">root@silverbullet:~#</span>
             <span>set target_domain =</span>
             <select id="domain-select">
                 <option value="random">ALL (Random Mix)</option>
@@ -102,7 +250,7 @@
             </select>
         </div>
         <div class="prompt-line">
-            <span class="prompt-prefix">root@silverbullet:~#</span> 
+            <span class="prompt-prefix">root@silverbullet:~#</span>
             <span>set data_format =</span>
             <select id="format">
                 <option value="email:pass">email:pass</option>
@@ -110,21 +258,21 @@
             </select>
         </div>
         <div class="prompt-line">
-            <span class="prompt-prefix">root@silverbullet:~#</span> 
-            <label class="checkbox-label" id="live-mode-label">
+            <span class="prompt-prefix">root@silverbullet:~#</span>
+            <label class="checkbox-label">
                 <input type="checkbox" id="live-mode">
                 [ ENABLE ] LIVE SCRAPE (real public combos)
             </label>
         </div>
         <div class="prompt-line">
-            <span class="prompt-prefix">root@silverbullet:~#</span> 
+            <span class="prompt-prefix">root@silverbullet:~#</span>
             <label class="checkbox-label">
                 <input type="checkbox" id="opt-numbers" checked>
                 [ ENABLE ] silverbullet_suffix_injection
             </label>
         </div>
         <div class="prompt-line">
-            <span class="prompt-prefix">root@silverbullet:~#</span> 
+            <span class="prompt-prefix">root@silverbullet:~#</span>
             <label class="checkbox-label">
                 <input type="checkbox" id="opt-caps" checked>
                 [ ENABLE ] SVB_fresh_data
@@ -146,13 +294,76 @@
     <textarea id="data-dump" readonly spellcheck="false"></textarea>
 
     <script>
-        // ---------- OLD FAKE GENERATOR (used when live mode is off) ----------
-        const first = [ /* ... same as before ... */ ];
-        const last = [ /* ... same as before ... */ ];
-        const domains = [ /* ... same as before ... */ ];
-        const specialChars = ['!', '@', '#', '$', '?', '*'];
+        // ---------- REALISTIC FAKE GENERATOR (fallback) ----------
+        const firstNames = [
+            "lukas","leon","finn","paul","jonas","ben","maximilian","anna","mia","emma","hannah","sophia","lena","lea","felix","tim",
+            "julian","niklas","max","moritz","david","elias","louis","marie","laura","sarah","lara","neele","lisa","charlotte","clara",
+            "johanna","alex","michael","daniel","christian","stefan","thomas","jan","kevin","dennis","patrick","martin","andreas",
+            "peter","frank","jens","dirk","uwe","dieter","werner","klaus","gunter","heinz","manfred","helmut","wolfgang","ursula",
+            "karin","sabine","monika","petra","renate","susanne","gisela","ingrid","christa","tobias","matthias","sebastian","philipp",
+            "simon","florian","dominik","marcel","sascha","rene","julia","stephanie","melanie","nadine","katharina"
+        ];
+        const lastNames = [
+            "mueller","schmidt","schneider","fischer","weber","meyer","wagner","becker","schulz","hoffmann","koch","bauer","richter",
+            "klein","wolf","schroeder","neumann","schwarz","zimmermann","braun","krueger","hofmann","hartmann","lange","schmitt","werner",
+            "krause","meier","sommer","fuchs","keller","schubert","roth","walter","kramer","huber","peters","lang","scholz","moeller",
+            "weiss","jung","haas","heinrich","kaiser","frank","friedrich","guenther","hermann","vogt","winkler","dietz","lorenz",
+            "ludwig","baumann","simon","boehm","horn","thomas","kuhn","seidel","arnold","busch","beyer","barth","herrmann"
+        ];
+        const commonPasswords = [
+            "password","passwort","hallo","hallo123","schalke04","borussia","bayern","ficken","arschloch","123456","123456789",
+            "qwertz","qwertz123","sommer","winter","sonnenschein","liebe","freiheit","deutschland","berlin","hamburg","muenchen",
+            "koeln","frankfurt","stuttgart","dortmund","leipzig","hannover","nuernberg","bremen","essen","dresden","augsburg",
+            "mainz","bielefeld","mannheim","karlsruhe","wiesbaden","ludwigshafen","oldenburg","osnabrueck","saarbruecken",
+            "magdeburg","halle","kiel","luebeck","flensburg","rostock","erfurt","jena","gera","cottbus","potsdam","brandenburg",
+            "schwerin","stralsund","greifswald","passau","regensburg","wuerzburg","trier","koblenz","darmstadt","kassel",
+            "goettingen","marburg","siegen","paderborn","bielefeld","guetersloh","bochum","herne","recklinghausen",
+            "oberhausen","moenchengladbach","duesseldorf","neuss","leverkusen","bergisch","solingen","wuppertal","hagen",
+            "iserlohn","luedenscheid","arnsberg","soest","paderborn","detmold","minden","bueckeburg","hameln","goettingen",
+            "hildesheim","salzgitter","wolfsburg","braunschweig","hannover","celle","lueneburg","soltau","buxtehude",
+            "stade","harburg","lueneburg","uelzen","lueneburg","dannenberg","lueneburg"
+        ];
+        const domainsWeighted = [
+            {domain:"web.de", weight:35}, {domain:"gmx.de", weight:20}, {domain:"gmail.com", weight:15},
+            {domain:"t-online.de", weight:10}, {domain:"outlook.com", weight:5}, {domain:"hotmail.de", weight:3},
+            {domain:"icloud.com", weight:3}, {domain:"mail.de", weight:2}, {domain:"freenet.de", weight:2},
+            {domain:"online.de", weight:2}, {domain:"posteo.de", weight:1}, {domain:"mailbox.org", weight:1},
+            {domain:"yahoo.de", weight:1}, {domain:"live.de", weight:1}, {domain:"aol.de", weight:0.5}
+        ];
+
+        function weightedDomain() {
+            const total = domainsWeighted.reduce((s, d) => s + d.weight, 0);
+            let r = Math.random() * total;
+            for (const d of domainsWeighted) {
+                r -= d.weight;
+                if (r <= 0) return d.domain;
+            }
+            return "web.de";
+        }
+
+        function getRealisticEmail(f, l, d) {
+            const p = Math.random();
+            if (p < 0.3) return `${f}.${l}@${d}`;
+            if (p < 0.5) return `${f}${l}@${d}`;
+            if (p < 0.65) return `${f}_${l}@${d}`;
+            if (p < 0.75) return `${f}.${l}${Math.floor(Math.random()*99)}@${d}`;
+            if (p < 0.85) return `${l}.${f}@${d}`;
+            if (p < 0.92) return `${f.charAt(0)}.${l}@${d}`;
+            return `${f}${Math.floor(Math.random()*9999)}@${d}`;
+        }
+
+        function getRealisticPassword(lastName, yearHint) {
+            const choice = Math.random();
+            if (choice < 0.4) return commonPasswords[Math.floor(Math.random() * commonPasswords.length)];
+            if (choice < 0.7) {
+                const suffix = yearHint || (1980 + Math.floor(Math.random() * 45));
+                return Math.random() < 0.5 ? lastName.charAt(0).toUpperCase() + lastName.slice(1) + suffix : lastName + suffix;
+            }
+            if (choice < 0.9) return lastName + Math.floor(Math.random() * 99);
+            return Array(8).fill(0).map(() => Math.random().toString(36)[2]).join('');
+        }
+
         const getRandom = arr => arr[Math.floor(Math.random() * arr.length)];
-        // ... old getUser, getPass, getDynamicSuffix functions as before ...
 
         // ---------- DOM ELEMENTS ----------
         const DOM = {
@@ -172,9 +383,41 @@
         };
 
         const sleep = ms => new Promise(r => setTimeout(r, ms));
-        function generateFakeIP() { /* ... same as before ... */ }
-        async function printLine(html, delay = 100) { /* ... same as before ... */ }
-        async function runBreachSequence(amount, targetDomain) { /* ... same as before, but can be shorter for live mode ... */ }
+
+        function generateFakeIP() {
+            return `${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`;
+        }
+
+        async function printLine(html, delay = 100) {
+            DOM.console.innerHTML += html + "<br>";
+            DOM.console.scrollTop = DOM.console.scrollHeight;
+            await sleep(delay);
+        }
+
+        async function runBreachSequence(amount, targetDomain) {
+            DOM.console.style.display = "block";
+            DOM.dataDump.style.display = "none";
+            DOM.console.innerHTML = "";
+            DOM.btnCopy.classList.add("hidden");
+            DOM.btnExport.classList.add("hidden");
+
+            await printLine(`<span class="cyan">[*] Initializing Silverbullet Breach Protocol v3.0...</span>`, 300);
+            await printLine(`<span class="yellow">[*] Resolving TOR Relays...</span>`, 200);
+            for(let i=0; i<3; i++) {
+                DOM.hudIp.innerText = generateFakeIP();
+                await printLine(`  -> Bouncing through node [${DOM.hudIp.innerText}] ... <span class="green">OK</span>`, 150);
+            }
+            await printLine(`<br><span class="cyan">[*] Target Configured:</span> ${targetDomain.toUpperCase()} <span class="magenta">@SVB_MAIN_DB</span>`, 400);
+            await printLine(`<span class="yellow">[!] Bypassing firewall...</span>`, 400);
+            await printLine(`<span class="green">[+] Connection established.</span>`, 200);
+            await printLine(`<br><span class="magenta">[>] Commencing Data Extraction...</span><br>`, 300);
+            for (let i = 1; i <= 5; i++) {
+                let fakeHash = Math.random().toString(36).substring(2, 15).toUpperCase();
+                await printLine(`  <span class="yellow">[ STREAM ]</span> Block 0x${fakeHash} -> Decrypting... <span class="green">OK</span>`, 60);
+            }
+            await sleep(300);
+            await printLine(`<br><span class="green">[ SUCCESS ] Payload Extracted.</span><br>`, 200);
+        }
 
         // ---------- LIVE SCRAPE FUNCTION ----------
         async function scrapeLiveCombos(amount) {
@@ -182,15 +425,32 @@
                 const res = await fetch('/api/combo-scraper', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ keyword: 'combo email:pass', maxResults: Math.min(amount, 500) }),
+                    body: JSON.stringify({ maxResults: Math.min(amount, 500) }),
                 });
-                if (!res.ok) throw new Error('Scraper error');
                 const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Scraper error');
                 return data.combos || [];
             } catch (err) {
-                console.error(err);
-                return [];
+                await printLine(`<span class="red">[ ERROR ]</span> ${err.message}`, 0);
+                throw err;
             }
+        }
+
+        // ---------- GENERATE FAKE COMBO (fallback) ----------
+        function generateFakeCombo() {
+            const f = getRandom(firstNames);
+            const l = getRandom(lastNames);
+            const domain = DOM.domainSelect.value === 'random' ? weightedDomain() : DOM.domainSelect.value;
+            const email = getRealisticEmail(f, l, domain);
+            const userPrefix = email.split('@')[0];
+            const password = getRealisticPassword(l, DOM.optNum.checked ? (1980 + Math.floor(Math.random() * 45)) : null);
+            let finalPw = password;
+            if (DOM.optCaps.checked) finalPw = finalPw.charAt(0).toUpperCase() + finalPw.slice(1);
+
+            if (DOM.format.value === 'user:pass') {
+                return `${userPrefix}:${finalPw}`;
+            }
+            return `${email}:${finalPw}`;
         }
 
         // ---------- GENERATE BUTTON (SMART: LIVE OR FAKE) ----------
@@ -206,14 +466,12 @@
 
             const useLive = DOM.liveMode.checked;
             try {
-                // Run the breach animation (shorter if live)
-                await runBreachSequence(amount, 'LIVE_SCRAPE');
+                const target = useLive ? 'LIVE_PASTEBIN' : (DOM.domainSelect.value === 'random' ? 'ALL_DOMAINS' : DOM.domainSelect.value);
+                await runBreachSequence(amount, target);
 
                 let finalArray = [];
                 if (useLive) {
-                    // Scrape real combos
                     finalArray = await scrapeLiveCombos(amount);
-                    // If not enough, pad with fake
                     if (finalArray.length < amount) {
                         const fakeSet = new Set(finalArray);
                         while (fakeSet.size < amount) {
@@ -222,7 +480,6 @@
                         finalArray = Array.from(fakeSet).slice(0, amount);
                     }
                 } else {
-                    // Old fake generator
                     const resultsSet = new Set();
                     let loopLimit = amount * 1.5;
                     let attempts = 0;
@@ -252,22 +509,31 @@
             }
         });
 
-        // ---------- OLD FAKE COMBO GENERATOR FUNCTION ----------
-        function generateFakeCombo() {
-            // ... (use the old fake generation code, but I'll include a simplified version)
-            const f = getRandom(first);
-            const l = getRandom(last);
-            const domain = DOM.domainSelect.value === 'random' ? getRandom(domains) : DOM.domainSelect.value;
-            const user = getRandom([`${f}.${l}`, `${f}${l}`, `${f}_${l}`, `${f}${Math.floor(Math.random()*99)}`]);
-            const pass = l + (DOM.optNum.checked ? Math.floor(Math.random()*9999) : '');
-            const finalPw = DOM.optCaps.checked ? pass.charAt(0).toUpperCase() + pass.slice(1) : pass;
-            if (DOM.format.value === 'user:pass') return `${user}:${finalPw}`;
-            return `${user}@${domain}:${finalPw}`;
-        }
-
         // ---------- COPY & EXPORT (unchanged) ----------
-        DOM.btnCopy.addEventListener('click', async () => { /* ... same as before ... */ });
-        DOM.btnExport.onclick = () => { /* ... same as before ... */ };
+        DOM.btnCopy.addEventListener('click', async () => {
+            if (!DOM.dataDump.value) return;
+            try {
+                await navigator.clipboard.writeText(DOM.dataDump.value);
+                const orig = DOM.btnCopy.innerText;
+                DOM.btnCopy.innerText = "[ COPIED ]";
+                DOM.btnCopy.style.color = "var(--bg)";
+                DOM.btnCopy.style.background = "var(--green)";
+                setTimeout(() => {
+                    DOM.btnCopy.innerText = orig;
+                    DOM.btnCopy.style.color = "";
+                    DOM.btnCopy.style.background = "transparent";
+                }, 2000);
+            } catch (e) { alert('Copy failed.'); }
+        });
+
+        DOM.btnExport.onclick = () => {
+            if (!DOM.dataDump.value) return;
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([DOM.dataDump.value], {type: 'text/plain'}));
+            a.download = `SVB_Germany_Combos_${DOM.amount.value}.txt`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        };
     </script>
 </body>
 </html>
